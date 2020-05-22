@@ -3,9 +3,7 @@ package graphs;
 import schema.Graph;
 import schema.Node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class AdjacencyGraph<T> extends Graph {
 
@@ -20,11 +18,25 @@ public class AdjacencyGraph<T> extends Graph {
     public static void main(String [] args){
         AdjacencyGraph myAdjacencyGraph = new AdjacencyGraph();
         try{
-            myAdjacencyGraph.newVertex("vertex1", 23);
-            myAdjacencyGraph.newVertex("vertex2", 24);
-            myAdjacencyGraph.newVertex("vertex3", 25);
-            myAdjacencyGraph.addArch("vertex1", "vertex2");
-            myAdjacencyGraph.addArch("vertex1", "vertex3");
+            myAdjacencyGraph.newVertex("A");
+            myAdjacencyGraph.newVertex("B");
+            myAdjacencyGraph.newVertex("C");
+            myAdjacencyGraph.newVertex("D");
+            myAdjacencyGraph.newVertex("E");
+            myAdjacencyGraph.newVertex("X");
+            myAdjacencyGraph.newVertex("P");
+            myAdjacencyGraph.newVertex("APA");
+            myAdjacencyGraph.newVertex("AANG");
+
+            myAdjacencyGraph.addArch("A", "B"); myAdjacencyGraph.addArch("A", "C"); myAdjacencyGraph.addArch("A", "X");
+            myAdjacencyGraph.addArch("B", "D"); myAdjacencyGraph.addArch("B", "E");
+            myAdjacencyGraph.addArch("C", "D"); myAdjacencyGraph.addArch("C", "X");
+            myAdjacencyGraph.addArch("D", "E"); myAdjacencyGraph.addArch("D", "P");
+            myAdjacencyGraph.addArch("X", "P");
+            myAdjacencyGraph.addArch("APA", "AANG");
+
+            System.out.println(myAdjacencyGraph.breadthFirstTraversal("C"));
+
         }catch (Exception e){
             System.out.println(e);
         }
@@ -99,7 +111,8 @@ public class AdjacencyGraph<T> extends Graph {
 
 
     @Override
-    public boolean BSF(String nodeName) {
+    public boolean BFS(String nodeName) {
+
         return false;
     }
 
@@ -109,12 +122,40 @@ public class AdjacencyGraph<T> extends Graph {
     }
 
     @Override
-    public void breadthFirstTraversal() {
+    public String breadthFirstTraversal(String partingNode) throws NodeNotFound {
+        if(nodeMap.get(partingNode) == null) throw new NodeNotFound();
+        Queue<String> toVisit = new LinkedList();
+        HashSet<String> visited = new HashSet();
+        String result = partingNode;
 
+        toVisit.add(partingNode);
+        visited.add(partingNode);
+        while(visited.size() < nodeMap.size()){
+            // To consider lonely nodes
+            if(toVisit.isEmpty()){
+                for (Map.Entry<String, Node> entry : nodeMap.entrySet()){
+                    if(!visited.contains(entry.getKey())) {
+                        visited.add(entry.getValue().getNodeName());
+                        toVisit.add(entry.getKey());
+                        result += " -> " + entry.getValue().getNodeName();
+                    }
+                }
+            }
+
+            for(Node node : adjListMap.get(toVisit.peek())){
+                if(!visited.contains(node.getNodeName())){
+                    visited.add(node.getNodeName());
+                    result += " -> " + node.getNodeName();
+                    toVisit.add(node.getNodeName());
+                }
+            }
+            toVisit.remove();
+        }
+        return result;
     }
 
     @Override
-    public void deepFirstTraversal() {
+    public void deepFirstTraversal(String partingNode) {
 
     }
 }

@@ -12,5 +12,5 @@ public abstract class Graph {
     public abstract boolean BFS(String nodeName); //Breadth First Search
     public abstract boolean DFS(String nodeName); //Depth First Search
     public abstract String breadthFirstTraversal(String partingNode) throws NodeNotFound;
-    public abstract void deepFirstTraversal(String partingNode);
+    public abstract String deepFirstTraversal(String partingNode) throws NodeNotFound;
 }

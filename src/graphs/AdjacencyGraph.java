@@ -25,17 +25,13 @@ public class AdjacencyGraph<T> extends Graph {
             myAdjacencyGraph.newVertex("E");
             myAdjacencyGraph.newVertex("X");
             myAdjacencyGraph.newVertex("P");
-            myAdjacencyGraph.newVertex("APA");
-            myAdjacencyGraph.newVertex("AANG");
 
             myAdjacencyGraph.addArch("A", "B"); myAdjacencyGraph.addArch("A", "C"); myAdjacencyGraph.addArch("A", "X");
             myAdjacencyGraph.addArch("B", "D"); myAdjacencyGraph.addArch("B", "E");
             myAdjacencyGraph.addArch("C", "D"); myAdjacencyGraph.addArch("C", "X");
             myAdjacencyGraph.addArch("D", "E"); myAdjacencyGraph.addArch("D", "P");
             myAdjacencyGraph.addArch("X", "P");
-            myAdjacencyGraph.addArch("APA", "AANG");
-
-            System.out.println(myAdjacencyGraph.breadthFirstTraversal("C"));
+            System.out.println(myAdjacencyGraph.deepFirstTraversal("C"));
 
         }catch (Exception e){
             System.out.println(e);
@@ -109,17 +105,37 @@ public class AdjacencyGraph<T> extends Graph {
         nodeMap.remove(nodeName);
     }
 
-
     @Override
     public boolean BFS(String nodeName) {
+        if(nodeMap.isEmpty()) return false;
+        Queue<String> toVisit = new LinkedList();
+        HashSet<String> visited = new HashSet();
+        String firstNode = nodeMap.entrySet().iterator().next().getKey();
 
-        return false;
+        toVisit.add(firstNode);
+        visited.add(firstNode);
+        while(visited.size() < nodeMap.size()){
+            // To consider lonely nodes
+            if(toVisit.isEmpty()){
+                for (Map.Entry<String, Node> entry : nodeMap.entrySet()){
+                    if(!visited.contains(entry.getKey())) {
+                        visited.add(entry.getValue().getNodeName());
+                        toVisit.add(entry.getKey());
+                    }
+                }
+            }
+
+            for(Node node : adjListMap.get(toVisit.peek())){
+                if(!visited.contains(node.getNodeName())){
+                    visited.add(node.getNodeName());
+                    toVisit.add(node.getNodeName());
+                }
+            }
+            toVisit.remove();
+        }
+        return visited.contains(nodeName);
     }
 
-    @Override
-    public boolean DFS(String nodeName) {
-        return false;
-    }
 
     @Override
     public String breadthFirstTraversal(String partingNode) throws NodeNotFound {
@@ -155,7 +171,44 @@ public class AdjacencyGraph<T> extends Graph {
     }
 
     @Override
-    public void deepFirstTraversal(String partingNode) {
+    public boolean DFS(String nodeName) {
+        return false;
+    }
 
+    @Override
+    public String deepFirstTraversal(String partingNode) throws NodeNotFound {
+        if(nodeMap.get(partingNode) == null) throw new NodeNotFound();
+        Stack<String> toVisit = new Stack<String>();
+        HashSet<String> visited = new HashSet();
+        String result = partingNode;
+
+        toVisit.add(partingNode);
+        visited.add(partingNode);
+        while(visited.size() < nodeMap.size()){
+            boolean found = false;
+
+            // To consider lonely nodes
+            if(toVisit.isEmpty()){
+                for (Map.Entry<String, Node> entry : nodeMap.entrySet()){
+                    if(!visited.contains(entry.getKey()) && !found) {
+                        visited.add(entry.getValue().getNodeName());
+                        toVisit.add(entry.getKey());
+                        result += " -> " + entry.getValue().getNodeName();
+                        found = true;
+                    }
+                }
+            }
+
+            for(Node node : adjListMap.get(toVisit.peek())){
+                if(!visited.contains(node.getNodeName()) && !found){
+                    visited.add(node.getNodeName());
+                    toVisit.add(node.getNodeName());
+                    result += " -> " + node.getNodeName();
+                    found = true;
+                }
+            }
+            if(!found) toVisit.pop();
+        }
+        return result;
     }
 }

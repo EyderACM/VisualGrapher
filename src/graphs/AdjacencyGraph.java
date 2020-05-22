@@ -24,7 +24,7 @@ public class AdjacencyGraph<T> extends Graph {
             myAdjacencyGraph.newVertex("vertex2", 24);
             myAdjacencyGraph.newVertex("vertex3", 25);
             myAdjacencyGraph.addArch("vertex1", "vertex2");
-            System.out.println(myAdjacencyGraph.isAdjacent("vertex2", "vertex1") ? "Sí" : "No");
+            myAdjacencyGraph.addArch("vertex1", "vertex3");
         }catch (Exception e){
             System.out.println(e);
         }
@@ -46,7 +46,22 @@ public class AdjacencyGraph<T> extends Graph {
 
     @Override
     public void removeArch(String firstNodeName, String secondNodeName) throws NodeNotFound {
-        // Remove instance of arch in their respective LinkedLists
+        if(!isAdjacent(firstNodeName, secondNodeName)) return;
+        if(nodeMap.get(firstNodeName) == null || nodeMap.get(secondNodeName) == null) throw new NodeNotFound();
+
+        int indexOfFirstArch = 0, indexOfSecondArch = 0;
+        for(Node node : adjListMap.get(firstNodeName)){
+            if(node.equals(secondNodeName)) break;
+            indexOfFirstArch++;
+        }
+
+        for(Node node : adjListMap.get(secondNodeName)){
+            if(node.equals(firstNodeName)) break;
+            indexOfSecondArch++;
+        }
+
+        adjListMap.get(firstNodeName).remove(indexOfFirstArch);
+        adjListMap.get(secondNodeName).remove(indexOfSecondArch);
     }
 
     @Override
@@ -73,7 +88,13 @@ public class AdjacencyGraph<T> extends Graph {
 
     @Override
     public void removeVertex(String nodeName) throws NodeNotFound {
-
+        //Remove all archs related to that node
+        for (Map.Entry<String, Node> entry : nodeMap.entrySet() ){
+            removeArch(nodeName, entry.getKey());
+        }
+        //Remove node instance
+        adjListMap.remove(nodeName);
+        nodeMap.remove(nodeName);
     }
 
 

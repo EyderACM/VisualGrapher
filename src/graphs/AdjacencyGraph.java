@@ -15,29 +15,6 @@ public class AdjacencyGraph<T> extends Graph {
         adjListMap = new HashMap<>();
     }
 
-    public static void main(String [] args){
-        AdjacencyGraph myAdjacencyGraph = new AdjacencyGraph();
-        try{
-            myAdjacencyGraph.newVertex("A");
-            myAdjacencyGraph.newVertex("B");
-            myAdjacencyGraph.newVertex("C");
-            myAdjacencyGraph.newVertex("D");
-            myAdjacencyGraph.newVertex("E");
-            myAdjacencyGraph.newVertex("X");
-            myAdjacencyGraph.newVertex("P");
-
-            myAdjacencyGraph.addArch("A", "B"); myAdjacencyGraph.addArch("A", "C"); myAdjacencyGraph.addArch("A", "X");
-            myAdjacencyGraph.addArch("B", "D"); myAdjacencyGraph.addArch("B", "E");
-            myAdjacencyGraph.addArch("C", "D"); myAdjacencyGraph.addArch("C", "X");
-            myAdjacencyGraph.addArch("D", "E"); myAdjacencyGraph.addArch("D", "P");
-            myAdjacencyGraph.addArch("X", "P");
-            System.out.println(myAdjacencyGraph.deepFirstTraversal("C"));
-
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
-
     public Node getVertex(String nodeName) throws NodeNotFound {
         if(nodeMap.get(nodeName) == null) throw new NodeNotFound();
         return nodeMap.get(nodeName);
@@ -172,7 +149,37 @@ public class AdjacencyGraph<T> extends Graph {
 
     @Override
     public boolean DFS(String nodeName) {
-        return false;
+        if(nodeMap.isEmpty()) return false;
+        Stack<String> toVisit = new Stack<String>();
+        HashSet<String> visited = new HashSet();
+        String firstNode = nodeMap.entrySet().iterator().next().getKey();
+
+        toVisit.add(firstNode);
+        visited.add(firstNode);
+        while(visited.size() < nodeMap.size()){
+            boolean found = false;
+
+            // To consider lonely nodes
+            if(toVisit.isEmpty()){
+                for (Map.Entry<String, Node> entry : nodeMap.entrySet()){
+                    if(!visited.contains(entry.getKey()) && !found) {
+                        visited.add(entry.getValue().getNodeName());
+                        toVisit.add(entry.getKey());
+                        found = true;
+                    }
+                }
+            }
+
+            for(Node node : adjListMap.get(toVisit.peek())){
+                if(!visited.contains(node.getNodeName()) && !found){
+                    visited.add(node.getNodeName());
+                    toVisit.add(node.getNodeName());
+                    found = true;
+                }
+            }
+            if(!found) toVisit.pop();
+        }
+        return visited.contains(nodeName);
     }
 
     @Override

@@ -1,3 +1,4 @@
+import graphs.AdjacencyGraph;
 import processing.core.PApplet;
 
 public class Client extends PApplet {
@@ -18,6 +19,27 @@ public class Client extends PApplet {
     }
 
     public static void main(String[] args){
-        PApplet.main("Client");
+        //PApplet.main("Client");
+
+        AdjacencyGraph myAdjacencyGraph = new AdjacencyGraph();
+        try{
+            myAdjacencyGraph.newVertex("A");
+            myAdjacencyGraph.newVertex("B");
+            myAdjacencyGraph.newVertex("C");
+            myAdjacencyGraph.newVertex("D");
+            myAdjacencyGraph.newVertex("E");
+            myAdjacencyGraph.newVertex("X");
+            myAdjacencyGraph.newVertex("P");
+
+            myAdjacencyGraph.addArch("A", "B"); myAdjacencyGraph.addArch("A", "C"); myAdjacencyGraph.addArch("A", "X");
+            myAdjacencyGraph.addArch("B", "D"); myAdjacencyGraph.addArch("B", "E");
+            myAdjacencyGraph.addArch("C", "D"); myAdjacencyGraph.addArch("C", "X");
+            myAdjacencyGraph.addArch("D", "E"); myAdjacencyGraph.addArch("D", "P");
+            myAdjacencyGraph.addArch("X", "P");
+            System.out.println(myAdjacencyGraph.DFS("C"));
+
+        }catch (Exception e){
+            System.out.println(e);
+        }
     }
 }

@@ -1,27 +1,57 @@
-import graphs.AdjacencyGraph;
-import processing.core.PApplet;
+package client;
+
+import client.components.*;
+import processing.core.*;
+
+import java.util.ArrayList;
 
 public class Client extends PApplet {
+
+    ArrayList<VNode> nodeList;
+    Boolean mouseClickedOnCanvas = false;
+    int nodeHeight = 40; int nodeWidth = 40;
 
     public void settings(){
         size(800, 600);
     }
 
     public void setup(){
-
+        nodeList = new ArrayList<VNode>();
     }
 
     public void draw(){
         background(360,360,360);
         textSize(30);
-        text("Funcionó bien bonito", 300, 300);
         fill(0, 0, 0);
+
+        for(VNode node : nodeList) node.display();
+        if(mouseClickedOnCanvas) createEllipsePreview();
+    }
+
+    public void createEllipse(String name, float xPos, float yPos){
+        VNode newNode = new VNode(name, xPos, yPos, nodeHeight, nodeWidth, this);
+        nodeList.add(newNode);
+    }
+
+    public void createEllipsePreview(){
+        fill(66, 237, 240);
+        noStroke();
+        ellipse(mouseX, mouseY, nodeHeight, nodeWidth);
+    }
+
+    public void mousePressed() {
+        mouseClickedOnCanvas = true;
+    }
+
+    public void mouseReleased(){
+        mouseClickedOnCanvas = false;
+        createEllipse("Ellipse", mouseX, mouseY);
     }
 
     public static void main(String[] args){
-        //PApplet.main("Client");
+        PApplet.main("client.Client");
 
-        AdjacencyGraph myAdjacencyGraph = new AdjacencyGraph();
+        /*AdjacencyGraph myAdjacencyGraph = new AdjacencyGraph();
         try{
             myAdjacencyGraph.newVertex("A");
             myAdjacencyGraph.newVertex("B");
@@ -40,6 +70,6 @@ public class Client extends PApplet {
 
         }catch (Exception e){
             System.out.println(e);
-        }
+        }*/
     }
 }

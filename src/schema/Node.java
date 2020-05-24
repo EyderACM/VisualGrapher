@@ -1,6 +1,6 @@
 package schema;
 
-public class Node<T> {
+public class Node<T>{
     String nodeName;
     T data;
 

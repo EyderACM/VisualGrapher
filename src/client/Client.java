@@ -9,7 +9,8 @@ public class Client extends PApplet {
 
     ArrayList<VNode> nodeList;
     Boolean mouseClickedOnCanvas = false;
-    int nodeHeight = 40; int nodeWidth = 40;
+    int nodeHeight = 50; int nodeWidth = 50;
+    boolean nameNodeState = false;
 
     public void settings(){
         size(800, 600);
@@ -31,6 +32,7 @@ public class Client extends PApplet {
     public void createEllipse(String name, float xPos, float yPos){
         VNode newNode = new VNode(name, xPos, yPos, nodeHeight, nodeWidth, this);
         nodeList.add(newNode);
+        nameNodeState = true;
     }
 
     public void createEllipsePreview(){
@@ -45,7 +47,25 @@ public class Client extends PApplet {
 
     public void mouseReleased(){
         mouseClickedOnCanvas = false;
-        createEllipse("Ellipse", mouseX, mouseY);
+        createEllipse("", mouseX, mouseY);
+    }
+
+    @Override
+    public void keyReleased() {
+        super.keyReleased();
+        if(nameNodeState) nameNode(nodeList.get(nodeList.size()-1));
+    }
+
+    public void nameNode(VNode nodeToName){
+        if(keyCode == ENTER){
+            nameNodeState = false;
+        }
+        if(keyCode == BACKSPACE && nodeToName.getNodeName().length() > 0){
+            nodeToName.setNodeName(nodeToName.getNodeName().substring(0, nodeToName.getNodeName().length()-1));
+        }
+        if((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z')){
+            nodeToName.setNodeName(nodeToName.getNodeName().concat(str(key)));
+        }
     }
 
     public static void main(String[] args){

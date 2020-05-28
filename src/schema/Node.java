@@ -17,6 +17,8 @@ public class Node<T>{
         return data;
     }
 
+    public void setNodeName(String nodeName ){ this.nodeName = nodeName; }
+
     public boolean equals(Node toCompare){
         return nodeName.equals(toCompare.getNodeName());
     }

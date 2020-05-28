@@ -30,5 +30,12 @@ public class VNode extends Node {
         parent.fill(66, 237, 240);
         parent.noStroke();
         parent.ellipse(xPos, yPos, height, width);
+
+        parent.pushStyle();
+        parent.textAlign(PApplet.CENTER);
+        parent.fill(0, 0, 0);
+        parent.text(getNodeName(), xPos, yPos+10);
+        parent.textSize(2);
+        parent.popStyle();
     }
 }

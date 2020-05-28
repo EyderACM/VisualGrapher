@@ -7,6 +7,7 @@ public class VNode extends Node {
 
     private float xPos, yPos, height, width;
     private PApplet parent;
+    public boolean stroked = true;
 
     public VNode(Object data, String nodeName, float xPos, float yPos, float height, float width, PApplet parent) {
         super(data, nodeName);
@@ -29,13 +30,25 @@ public class VNode extends Node {
     public void display(){
         parent.fill(66, 237, 240);
         parent.noStroke();
-        parent.ellipse(xPos, yPos, height, width);
+        if(stroked) parent.stroke(125, 177, 255);
+        Double increment = this.getNodeName().length() <= 1 ? 0 : this.getNodeName().length()*12.8;
+        parent.ellipse(xPos, yPos, height+increment.floatValue(), width+increment.floatValue());
 
         parent.pushStyle();
         parent.textAlign(PApplet.CENTER);
-        parent.fill(0, 0, 0);
+        parent.fill(360, 360, 360);
         parent.text(getNodeName(), xPos, yPos+10);
-        parent.textSize(2);
+        parent.textSize(1);
         parent.popStyle();
+    }
+
+    public void onHover(){
+        if(parent.dist(parent.mouseX, parent.mouseY, xPos, yPos) < height){
+            parent.stroke(125, 177, 255);
+            parent.strokeWeight(2);
+            parent.noFill();
+            Double increment = this.getNodeName().length() <= 1 ? 0 : this.getNodeName().length()*12.8;
+            parent.ellipse(xPos, yPos, height+increment.floatValue()+7, width+increment.floatValue()+7);
+        }
     }
 }

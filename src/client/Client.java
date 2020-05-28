@@ -1,6 +1,7 @@
 package client;
 
 import client.components.*;
+import org.w3c.dom.Text;
 import processing.core.*;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ public class Client extends PApplet {
 
     ArrayList<VNode> nodeList;
     Boolean mouseClickedOnCanvas = false;
-    int nodeHeight = 50; int nodeWidth = 50;
+    int nodeHeight = 60; int nodeWidth = 60;
     boolean nameNodeState = false;
 
     public void settings(){
@@ -17,6 +18,7 @@ public class Client extends PApplet {
     }
 
     public void setup(){
+        frameRate(120);
         nodeList = new ArrayList<VNode>();
     }
 
@@ -25,8 +27,19 @@ public class Client extends PApplet {
         textSize(30);
         fill(0, 0, 0);
 
-        for(VNode node : nodeList) node.display();
-        if(mouseClickedOnCanvas) createEllipsePreview();
+        for(VNode node : nodeList) {
+            node.display();
+            node.onHover();
+        }
+        if(mouseClickedOnCanvas && !nameNodeState) createEllipsePreview();
+        if(nameNodeState) {
+            pushStyle();
+            textAlign(PApplet.CENTER);
+            fill(0);
+            text("Name your node, press enter once finished", width/2, 35);
+            textSize(1);
+            popStyle();
+        }
     }
 
     public void createEllipse(String name, float xPos, float yPos){
@@ -47,7 +60,8 @@ public class Client extends PApplet {
 
     public void mouseReleased(){
         mouseClickedOnCanvas = false;
-        createEllipse("", mouseX, mouseY);
+        if(!nameNodeState)
+            createEllipse("", mouseX, mouseY);
     }
 
     @Override
@@ -59,11 +73,12 @@ public class Client extends PApplet {
     public void nameNode(VNode nodeToName){
         if(keyCode == ENTER){
             nameNodeState = false;
+            nodeToName.stroked = false;
         }
         if(keyCode == BACKSPACE && nodeToName.getNodeName().length() > 0){
             nodeToName.setNodeName(nodeToName.getNodeName().substring(0, nodeToName.getNodeName().length()-1));
         }
-        if((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z')){
+        if(((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z')) && nodeToName.getNodeName().length() < 7){
             nodeToName.setNodeName(nodeToName.getNodeName().concat(str(key)));
         }
     }

@@ -28,13 +28,13 @@ public class VNode extends Node {
     }
 
     public void display(){
+        parent.pushStyle();
         parent.fill(66, 237, 240);
         parent.noStroke();
         if(stroked) parent.stroke(125, 177, 255);
         Double increment = this.getNodeName().length() <= 1 ? 0 : this.getNodeName().length()*12.8;
         parent.ellipse(xPos, yPos, height+increment.floatValue(), width+increment.floatValue());
 
-        parent.pushStyle();
         parent.textAlign(PApplet.CENTER);
         parent.fill(360, 360, 360);
         parent.text(getNodeName(), xPos, yPos+10);
@@ -44,11 +44,13 @@ public class VNode extends Node {
 
     public void onHover(){
         if(parent.dist(parent.mouseX, parent.mouseY, xPos, yPos) < height){
+            parent.pushStyle();
             parent.stroke(125, 177, 255);
             parent.strokeWeight(2);
             parent.noFill();
             Double increment = this.getNodeName().length() <= 1 ? 0 : this.getNodeName().length()*12.8;
             parent.ellipse(xPos, yPos, height+increment.floatValue()+7, width+increment.floatValue()+7);
+            parent.popStyle();
         }
     }
 }

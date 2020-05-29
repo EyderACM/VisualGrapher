@@ -9,30 +9,29 @@ import java.util.ArrayList;
 public class Client extends PApplet {
 
     ArrayList<VNode> nodeList;
-    Boolean mouseClickedOnCanvas = false;
     int nodeHeight = 60; int nodeWidth = 60;
-    boolean nameNodeState = false;
 
     public void settings(){
-        size(800, 600);
+        size(1200, 600);
     }
 
     public void setup(){
+
         frameRate(120);
         nodeList = new ArrayList<VNode>();
     }
 
     public void draw(){
-        background(360,360,360);
+        background(235,235,235);
+        createSidePanel();
         textSize(30);
-        fill(0, 0, 0);
 
         for(VNode node : nodeList) {
             node.display();
             node.onHover();
         }
-        if(mouseClickedOnCanvas && !nameNodeState) createEllipsePreview();
-        if(nameNodeState) {
+        if(States.mouseClickedOnCanvas && !States.nameNodeState) createEllipsePreview();
+        if(States.nameNodeState) {
             pushStyle();
             textAlign(PApplet.CENTER);
             fill(0);
@@ -42,10 +41,15 @@ public class Client extends PApplet {
         }
     }
 
+    public void createSidePanel(){
+        SidePanel sPanel = new SidePanel(this);
+        sPanel.build();
+    }
+
     public void createEllipse(String name, float xPos, float yPos){
         VNode newNode = new VNode(name, xPos, yPos, nodeHeight, nodeWidth, this);
         nodeList.add(newNode);
-        nameNodeState = true;
+        States.nameNodeState = true;
     }
 
     public void createEllipsePreview(){
@@ -55,24 +59,25 @@ public class Client extends PApplet {
     }
 
     public void mousePressed() {
-        mouseClickedOnCanvas = true;
+        if(States.forCreation)
+            States.mouseClickedOnCanvas = true;
     }
 
     public void mouseReleased(){
-        mouseClickedOnCanvas = false;
-        if(!nameNodeState)
+        if(!States.nameNodeState && States.mouseClickedOnCanvas && mouseX > 300)
             createEllipse("", mouseX, mouseY);
+        States.mouseClickedOnCanvas = false;
     }
 
     @Override
     public void keyReleased() {
         super.keyReleased();
-        if(nameNodeState) nameNode(nodeList.get(nodeList.size()-1));
+        if(States.nameNodeState) nameNode(nodeList.get(nodeList.size()-1));
     }
 
     public void nameNode(VNode nodeToName){
         if(keyCode == ENTER){
-            nameNodeState = false;
+            States.nameNodeState = false;
             nodeToName.stroked = false;
         }
         if(keyCode == BACKSPACE && nodeToName.getNodeName().length() > 0){

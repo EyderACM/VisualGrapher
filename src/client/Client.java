@@ -1,6 +1,8 @@
 package client;
 
 import client.components.*;
+import graphs.AdjacencyGraph;
+import graphs.MatrixGraph;
 import org.w3c.dom.Text;
 import processing.core.*;
 
@@ -9,6 +11,8 @@ import java.util.ArrayList;
 public class Client extends PApplet {
 
     ArrayList<VNode> nodeList;
+    AdjacencyGraph adjacencyGraph;
+    MatrixGraph matrixGraph;
     int nodeHeight = 60; int nodeWidth = 60;
 
     public void settings(){
@@ -16,7 +20,8 @@ public class Client extends PApplet {
     }
 
     public void setup(){
-
+        adjacencyGraph = new AdjacencyGraph();
+        matrixGraph = new MatrixGraph();
         frameRate(120);
         nodeList = new ArrayList<VNode>();
     }
@@ -31,14 +36,27 @@ public class Client extends PApplet {
             node.onHover();
         }
         if(States.mouseClickedOnCanvas && !States.nameNodeState) createEllipsePreview();
+        if(States.invalidCreation) displayInvalidCreationAlert();
         if(States.nameNodeState) {
             pushStyle();
             textAlign(PApplet.CENTER);
             fill(0);
-            text("Name your node, press enter once finished", width/2, 35);
-            textSize(1);
+            text("Name your node, press enter once finished", width/2+50, 35);
             popStyle();
         }
+    }
+
+    public void displayInvalidCreationAlert(){
+        pushStyle();
+        fill(360, 360, 360);
+        rect(width-325, height-70, 350, 50, 15);
+        popStyle();
+
+        pushStyle();
+        fill(0);
+        textSize(20);
+        text("¡¡Please input a new node!!", width-300, height-40);
+        popStyle();
     }
 
     public void createSidePanel(){
@@ -77,8 +95,15 @@ public class Client extends PApplet {
 
     public void nameNode(VNode nodeToName){
         if(keyCode == ENTER){
-            States.nameNodeState = false;
-            nodeToName.stroked = false;
+            try{
+                matrixGraph.newVertex(nodeToName.getNodeName());
+                adjacencyGraph.newVertex(nodeToName.getNodeName());
+                States.nameNodeState = false;
+                nodeToName.stroked = false;
+                States.invalidCreation = false;
+            }catch (Exception e){
+                States.invalidCreation = true;
+            }
         }
         if(keyCode == BACKSPACE && nodeToName.getNodeName().length() > 0){
             nodeToName.setNodeName(nodeToName.getNodeName().substring(0, nodeToName.getNodeName().length()-1));

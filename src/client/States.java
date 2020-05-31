@@ -6,4 +6,6 @@ public class States {
     public static boolean forCreation = false;
     public static boolean invalidCreation = false;
     public static boolean archCreationState = false;
+    public static boolean forDeletionHover = false;
+    public static boolean deletionState = false;
 }

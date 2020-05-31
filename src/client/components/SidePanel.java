@@ -19,8 +19,12 @@ public class SidePanel {
 
         divisor(135);
         createSideNode();
-        sidePanelInstruction("Drag and drop the node", 190);
+        sidePanelInstruction("Drag and drop to create", 190);
         divisor(310);
+
+        deleteSideNode();
+        sidePanelInstruction("Click to delete a node", 365);
+        divisor(485);
     }
 
     private void createPanel(){
@@ -66,7 +70,7 @@ public class SidePanel {
         parent.popStyle();
     }
 
-    private void createSideNode(){
+    private void deleteSideNode(){
         parent.pushStyle();
         parent.fill(66, 237, 240);
         parent.noStroke();
@@ -77,6 +81,20 @@ public class SidePanel {
             States.forCreation = true;
         }
         parent.ellipse(ellipseX, ellipseY, 60, 60);
+        parent.popStyle();
+    }
+
+    private void createSideNode(){
+        parent.pushStyle();
+        parent.fill(255, 103, 92);
+        parent.noStroke();
+        States.forDeletionHover = false;
+        int ellipseX = 115, ellipseY = 395;
+        if(parent.dist(parent.mouseX, parent.mouseY, ellipseX, ellipseY) < 60){
+            parent.stroke(125, 177, 255);
+            States.forDeletionHover = true;
+        }
+        parent.rect(ellipseX, ellipseY, 60, 60);
         parent.popStyle();
     }
 }

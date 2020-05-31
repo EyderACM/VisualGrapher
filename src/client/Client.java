@@ -7,6 +7,7 @@ import org.w3c.dom.Text;
 import processing.core.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Client extends PApplet {
 
@@ -41,7 +42,7 @@ public class Client extends PApplet {
             node.display();
             node.onHover();
         }
-        if(States.archCreationState) createArchPreview();
+        if(States.archCreationState && !States.deletionState) createArchPreview();
         if(States.mouseClickedOnCanvas && !States.nameNodeState) createEllipsePreview();
         if(States.invalidCreation) displayInvalidCreationAlert();
         if(States.nameNodeState) {
@@ -83,8 +84,17 @@ public class Client extends PApplet {
             if(arch.nodesName.contains(toLink[0].getNodeName()) && arch.nodesName.contains(toLink[1].getNodeName()))
                 exists = true;
         }
-        if(!exists)
-            archs.add(new VArch(toLink[0].xPos, toLink[0].yPos, toLink[1].xPos, toLink[1].yPos, toLink[0].getNodeName(), toLink[1].getNodeName(), this));
+        if(!exists) {
+            String firstNodeName = toLink[0].getNodeName();
+            String secondNodeName = toLink[1].getNodeName();
+            archs.add(new VArch(toLink[0].xPos, toLink[0].yPos, toLink[1].xPos, toLink[1].yPos, firstNodeName, secondNodeName, this));
+            try{
+                adjacencyGraph.addArch(firstNodeName, secondNodeName);
+                matrixGraph.addArch(firstNodeName, secondNodeName);
+            }catch(Exception e){
+                System.out.println("Unexpected exception");
+            }
+        }
         States.archCreationState = false;
         toLink[0] = null;
         toLink[1] = null;
@@ -104,16 +114,42 @@ public class Client extends PApplet {
         popStyle();
     }
 
+    public void deleteNode(String nodeName){
+        try{
+            adjacencyGraph.removeVertex(nodeName);
+            matrixGraph.removeVertex(nodeName);
+        }catch (Exception e){
+            System.out.println("Didn't found hehe");
+        }
+        for(Iterator<VNode> it = nodeList.iterator(); it.hasNext();){
+            VNode node = it.next();
+            if(node.getNodeName().equals(nodeName)) it.remove();
+        }
+        for(Iterator<VArch> it = archs.iterator(); it.hasNext();){
+            VArch arch = it.next();
+            if(arch.nodesName.contains(nodeName)) it.remove();
+        }
+    }
+
     public void mousePressed() {
         VNode nodeNearby = isNearbyNode();
+
+        if(States.forDeletionHover && nodeNearby == null && !States.nameNodeState)
+            States.deletionState = !States.deletionState;
+
+        if(nodeNearby != null && !States.archCreationState && !States.deletionState && !States.nameNodeState){
+            toLink[0] = nodeNearby;
+            States.archCreationState = true;
+        }
+
+        if(States.deletionState && nodeNearby != null && !States.nameNodeState){
+            deleteNode(nodeNearby.getNodeName());
+            States.deletionState = false;
+        }
 
         if(States.forCreation && nodeNearby == null)
             States.mouseClickedOnCanvas = true;
 
-        if(nodeNearby != null && !States.archCreationState){
-            toLink[0] = nodeNearby;
-            States.archCreationState = true;
-        }
     }
 
     public void mouseReleased(){
@@ -155,6 +191,7 @@ public class Client extends PApplet {
                 nodeToName.stroked = false;
                 States.invalidCreation = false;
             }catch (Exception e){
+                System.out.println(e);
                 States.invalidCreation = true;
             }
         }

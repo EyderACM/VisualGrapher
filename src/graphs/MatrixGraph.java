@@ -106,6 +106,7 @@ public class MatrixGraph<T> extends Graph {
         for (ArrayList<Integer> list : adjacentMatrix){
             list.remove(nodePos);
         }
+        nodeList.remove(nodePos);
         adjacentMatrix.remove(nodePos);
     }
 

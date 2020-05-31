@@ -11,6 +11,9 @@ import java.util.ArrayList;
 public class Client extends PApplet {
 
     ArrayList<VNode> nodeList;
+    ArrayList<VArch> archs;
+    VNode[] toLink;
+
     AdjacencyGraph adjacencyGraph;
     MatrixGraph matrixGraph;
     int nodeHeight = 60; int nodeWidth = 60;
@@ -20,10 +23,12 @@ public class Client extends PApplet {
     }
 
     public void setup(){
+        toLink = new VNode[2];
         adjacencyGraph = new AdjacencyGraph();
         matrixGraph = new MatrixGraph();
         frameRate(120);
         nodeList = new ArrayList<VNode>();
+        archs = new ArrayList<VArch>();
     }
 
     public void draw(){
@@ -31,10 +36,12 @@ public class Client extends PApplet {
         createSidePanel();
         textSize(30);
 
+        for(VArch arch : archs) arch.display();
         for(VNode node : nodeList) {
             node.display();
             node.onHover();
         }
+        if(States.archCreationState) createArchPreview();
         if(States.mouseClickedOnCanvas && !States.nameNodeState) createEllipsePreview();
         if(States.invalidCreation) displayInvalidCreationAlert();
         if(States.nameNodeState) {
@@ -70,21 +77,67 @@ public class Client extends PApplet {
         States.nameNodeState = true;
     }
 
+    public void createArch(){
+        boolean exists = false;
+        for(VArch arch : archs){
+            if(arch.nodesName.contains(toLink[0].getNodeName()) && arch.nodesName.contains(toLink[1].getNodeName()))
+                exists = true;
+        }
+        if(!exists)
+            archs.add(new VArch(toLink[0].xPos, toLink[0].yPos, toLink[1].xPos, toLink[1].yPos, toLink[0].getNodeName(), toLink[1].getNodeName(), this));
+        States.archCreationState = false;
+        toLink[0] = null;
+        toLink[1] = null;
+    }
+
     public void createEllipsePreview(){
         fill(66, 237, 240);
         noStroke();
         ellipse(mouseX, mouseY, nodeHeight, nodeWidth);
     }
 
+    public void createArchPreview(){
+        pushStyle();
+        stroke(66, 237, 240);
+        strokeWeight(5);
+        line(toLink[0].xPos, toLink[0].yPos, mouseX, mouseY);
+        popStyle();
+    }
+
     public void mousePressed() {
-        if(States.forCreation)
+        VNode nodeNearby = isNearbyNode();
+
+        if(States.forCreation && nodeNearby == null)
             States.mouseClickedOnCanvas = true;
+
+        if(nodeNearby != null && !States.archCreationState){
+            toLink[0] = nodeNearby;
+            States.archCreationState = true;
+        }
     }
 
     public void mouseReleased(){
+        VNode nodeNearby = isNearbyNode();
+
         if(!States.nameNodeState && States.mouseClickedOnCanvas && mouseX > 300)
             createEllipse("", mouseX, mouseY);
+
+        if(toLink[0] != null && nodeNearby != toLink[0] && nodeNearby != null){
+            toLink[1] = nodeNearby;
+            createArch();
+        }
+
+        States.archCreationState = false;
         States.mouseClickedOnCanvas = false;
+    }
+
+    public VNode isNearbyNode(){
+        for(VNode node : nodeList){
+            if(dist(mouseX, mouseY, node.xPos, node.yPos) < nodeHeight){
+                return node;
+            }
+        }
+        return null;
     }
 
     @Override

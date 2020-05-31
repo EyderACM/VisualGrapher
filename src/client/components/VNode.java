@@ -5,7 +5,7 @@ import schema.Node;
 
 public class VNode extends Node {
 
-    private float xPos, yPos, height, width;
+    public float xPos, yPos, height, width;
     private PApplet parent;
     public boolean stroked = true;
 

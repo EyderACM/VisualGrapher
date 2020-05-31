@@ -5,4 +5,5 @@ public class States {
     public static boolean nameNodeState = false;
     public static boolean forCreation = false;
     public static boolean invalidCreation = false;
+    public static boolean archCreationState = false;
 }

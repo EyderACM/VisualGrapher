@@ -3,7 +3,6 @@ package client;
 import client.components.*;
 import graphs.AdjacencyGraph;
 import graphs.MatrixGraph;
-import org.w3c.dom.Text;
 import processing.core.*;
 
 import java.util.ArrayList;
@@ -17,10 +16,12 @@ public class Client extends PApplet {
 
     AdjacencyGraph adjacencyGraph;
     MatrixGraph matrixGraph;
+
+    SearchInput inputReference;
     int nodeHeight = 60; int nodeWidth = 60;
 
     public void settings(){
-        size(1200, 600);
+        size(1300, 600);
     }
 
     public void setup(){
@@ -35,6 +36,7 @@ public class Client extends PApplet {
     public void draw(){
         background(235,235,235);
         createSidePanel();
+        createSearchPanel();
         textSize(30);
 
         for(VArch arch : archs) arch.display();
@@ -44,12 +46,14 @@ public class Client extends PApplet {
         }
         if(States.archCreationState && !States.deletionState) createArchPreview();
         if(States.mouseClickedOnCanvas && !States.nameNodeState) createEllipsePreview();
+        if(States.searchState && !States.deletionState && !States.nameNodeState) createSearchInput();
         if(States.invalidCreation) displayInvalidCreationAlert();
         if(States.nameNodeState) {
             pushStyle();
             textAlign(PApplet.CENTER);
             fill(0);
-            text("Name your node, press enter once finished", width/2+50, 35);
+            textSize(30);
+            text("Name your node, press enter once finished", width/2, 35);
             popStyle();
         }
     }
@@ -70,6 +74,17 @@ public class Client extends PApplet {
     public void createSidePanel(){
         SidePanel sPanel = new SidePanel(this);
         sPanel.build();
+    }
+
+    public void createSearchPanel(){
+        SearchPanel searchPanel = new SearchPanel(this);
+        searchPanel.build();
+    }
+
+    public void createSearchInput(){
+        SearchInput searchInput = new SearchInput(this, nodeList);
+        inputReference = searchInput;
+        searchInput.build();
     }
 
     public void createEllipse(String name, float xPos, float yPos){
@@ -134,6 +149,9 @@ public class Client extends PApplet {
     public void mousePressed() {
         VNode nodeNearby = isNearbyNode();
 
+        if((States.breadthSearchHover || States.deepSearchHover) && !States.nameNodeState)
+            States.searchState = !States.searchState;
+
         if(States.forDeletionHover && nodeNearby == null && !States.nameNodeState)
             States.deletionState = !States.deletionState;
 
@@ -155,7 +173,7 @@ public class Client extends PApplet {
     public void mouseReleased(){
         VNode nodeNearby = isNearbyNode();
 
-        if(!States.nameNodeState && States.mouseClickedOnCanvas && mouseX > 300)
+        if(!States.nameNodeState && States.mouseClickedOnCanvas && mouseX > 300 && mouseX < width-300)
             createEllipse("", mouseX, mouseY);
 
         if(toLink[0] != null && nodeNearby != toLink[0] && nodeNearby != null){
@@ -180,6 +198,7 @@ public class Client extends PApplet {
     public void keyReleased() {
         super.keyReleased();
         if(States.nameNodeState) nameNode(nodeList.get(nodeList.size()-1));
+        if(States.searchState) inputReference.typeMessage();
     }
 
     public void nameNode(VNode nodeToName){

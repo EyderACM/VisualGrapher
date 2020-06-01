@@ -8,7 +8,7 @@ public class VNode extends Node {
 
     public float xPos, yPos, height, width;
     private PApplet parent;
-    public boolean stroked = true;
+    public boolean stroked = true, found = false;
 
     public VNode(Object data, String nodeName, float xPos, float yPos, float height, float width, PApplet parent) {
         super(data, nodeName);
@@ -34,6 +34,7 @@ public class VNode extends Node {
         parent.noStroke();
         if(stroked) parent.stroke(125, 177, 255);
         if(States.deletionState) parent.stroke(255, 103, 92);
+        if(found) overFound();
         Double increment = this.getNodeName().length() <= 1 ? 0 : this.getNodeName().length()*12.8;
         parent.ellipse(xPos, yPos, height+increment.floatValue(), width+increment.floatValue());
 
@@ -44,8 +45,19 @@ public class VNode extends Node {
         parent.popStyle();
     }
 
+    public void overFound(){
+        parent.pushStyle();
+        parent.stroke(105, 191, 117);
+        parent.strokeWeight(2);
+        parent.noFill();
+        Double increment = this.getNodeName().length() <= 1 ? 0 : this.getNodeName().length()*12.8;
+        parent.ellipse(xPos, yPos, height+increment.floatValue()+7, width+increment.floatValue()+7);
+        parent.popStyle();
+    }
+
     public void onHover(){
         if(parent.dist(parent.mouseX, parent.mouseY, xPos, yPos) < height){
+            found = false;
             parent.pushStyle();
             parent.stroke(125, 177, 255);
             parent.strokeWeight(2);

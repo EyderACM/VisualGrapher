@@ -34,6 +34,7 @@ public class VNode extends Node {
         parent.noStroke();
         if(stroked) parent.stroke(125, 177, 255);
         if(States.deletionState) parent.stroke(255, 103, 92);
+        if(States.traverseState) parent.fill(255, 191, 64);
         if(found) overFound();
         Double increment = this.getNodeName().length() <= 1 ? 0 : this.getNodeName().length()*12.8;
         parent.ellipse(xPos, yPos, height+increment.floatValue(), width+increment.floatValue());

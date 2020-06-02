@@ -48,14 +48,18 @@ public class Client extends PApplet {
         if(States.mouseClickedOnCanvas && !States.nameNodeState) createEllipsePreview();
         if(States.searchState && !States.deletionState && !States.nameNodeState) createSearchInput();
         if(States.invalidCreation) displayInvalidCreationAlert();
-        if(States.nameNodeState) {
-            pushStyle();
-            textAlign(PApplet.CENTER);
-            fill(0);
-            textSize(30);
-            text("Name your node, press enter once finished", width/2, 35);
-            popStyle();
-        }
+        if(States.deletionState) instructionText("Pick a node to delete");
+        if(States.traverseState) instructionText("Pick the starting node");
+        if(States.nameNodeState) instructionText("Name your node, press enter once finished");
+    }
+
+    public void instructionText(String msg){
+        pushStyle();
+        textAlign(PApplet.CENTER);
+        fill(0);
+        textSize(30);
+        text(msg, width/2, 35);
+        popStyle();
     }
 
     public void displayInvalidCreationAlert(){
@@ -146,8 +150,22 @@ public class Client extends PApplet {
         }
     }
 
+    public void traverse(VNode nodeNearby){
+        try{
+            SearchPanel.traverseStr = States.breadthTraverseState
+                ? adjacencyGraph.breadthFirstTraversal(nodeNearby.getNodeName())
+                : adjacencyGraph.deepFirstTraversal(nodeNearby.getNodeName());
+        }catch(Exception e){}
+        States.traverseState = false;
+        States.breadthTraverseState = false;
+        States.deepTraverseState = false;
+    }
+
     public void mousePressed() {
         VNode nodeNearby = isNearbyNode();
+
+        if(States.traverseState && ! States.deletionState && !States.nameNodeState)
+            traverse(nodeNearby);
 
         if((States.breadthSearchHover || States.deepSearchHover) && !States.nameNodeState)
             States.searchState = !States.searchState;
@@ -165,6 +183,12 @@ public class Client extends PApplet {
             States.deletionState = false;
         }
 
+        if((States.breadthTraversalHover || States.deepTraversalHover) && !States.nameNodeState){
+            States.traverseState = true;
+            if(States.breadthTraversalHover) States.breadthTraverseState = true;
+            else States.deepTraverseState = true;
+        }
+
         if(States.forCreation && nodeNearby == null)
             States.mouseClickedOnCanvas = true;
 
@@ -173,7 +197,7 @@ public class Client extends PApplet {
     public void mouseReleased(){
         VNode nodeNearby = isNearbyNode();
 
-        if(!States.nameNodeState && States.mouseClickedOnCanvas && mouseX > 300 && mouseX < width-300)
+        if(!States.nameNodeState && States.mouseClickedOnCanvas && mouseX > 325 && mouseX < width-325)
             createEllipse("", mouseX, mouseY);
 
         if(toLink[0] != null && nodeNearby != toLink[0] && nodeNearby != null){
